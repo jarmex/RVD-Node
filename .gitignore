@@ -80,3 +80,5 @@ typings/
 
 # remove deployment file
 *.sh
+
+dist/

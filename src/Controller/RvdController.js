@@ -5,8 +5,9 @@ import ExternalServiceSteps from './ExternalServiceStep';
 import LogSteps from './LogStep';
 import UssdCollectSteps from './UssdCollectStep';
 import UssdSaySteps from './UssdSay';
+import { getLogger } from '../util';
 
-require('dotenv').config();
+const debug = getLogger().debugContext('rvd');
 
 export default class RVDController {
   constructor(session = {}, state = {}) {
@@ -23,8 +24,13 @@ export default class RVDController {
   }
 
   rvdProcess = async (moduleName) => {
+    const { $core_From: msisdn, $cell_id: cellid } = this.data;
     const allnodes = rvdjson.nodes.find((item) => item.name === moduleName);
-
+    debug(
+      `MODULE: ${moduleName}, NAME: ${
+        allnodes ? allnodes.label : ''
+      }, MSISDN=${msisdn}, cellid=${cellid}`,
+    );
     if (!allnodes) {
       return {
         message: process.env.DefaultMsg,
@@ -33,11 +39,6 @@ export default class RVDController {
       }; // for the error message
     }
 
-    const { msisdn, cellid } = this.data;
-    this.data = Object.assign(this.data, {
-      $core_From: msisdn,
-      $cell_id: cellid,
-    });
     let continueTo = null;
     const retmsg = { next: false };
     const { steps } = allnodes;
@@ -64,6 +65,7 @@ export default class RVDController {
 
         this.data = Object.assign(this.data, exdata.data);
         this.temp = Object.assign(this.temp, exdata.temp);
+
         // check for the control to continueTo
       } else if (item.kind === Kinds.log) {
         const logStep = new LogSteps();
@@ -75,7 +77,6 @@ export default class RVDController {
         retmsg.message = ucollect.message;
         retmsg.next = true;
         this.data = Object.assign(this.data, {
-          prevModule: moduleName,
           responses: ucollect.responses,
         });
         break;

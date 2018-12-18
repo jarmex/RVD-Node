@@ -36,9 +36,9 @@ export const ReplaceVariables = (strName, appdata = {}, tempdata = {}) => {
   if (retvalue) {
     let retstr = strName;
     retvalue.forEach((item) => {
-      if (appdata[item]) {
+      if (appdata[item] !== undefined) {
         retstr = retstr.replace(item, appdata[item]);
-      } else if (tempdata[item]) {
+      } else if (tempdata[item] !== undefined) {
         retstr = retstr.replace(item, tempdata[item]);
       }
     });

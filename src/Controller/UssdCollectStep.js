@@ -6,8 +6,12 @@ export default class UssdCollectSteps {
     const retmsg = {};
     // get the message to display
     const { messages, text, gatherType, menu, collectdigits } = step;
+
+    // replace the variables in the text
+    retmsg.message = ReplaceVariables(text, data, temp);
+    // ensure the message is an array
     const msgs = ensureArray(messages);
-    retmsg.message = text;
+
     if (messages) {
       const mMenu = msgs
         .map((item) => ReplaceVariables(item.text, data, temp))

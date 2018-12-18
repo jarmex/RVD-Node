@@ -2,6 +2,8 @@ import Redis from 'ioredis';
 import RVDController from './RvdController';
 import { getLogger } from '../util';
 
+require('dotenv').config();
+
 const redis = new Redis({ keyPrefix: 'paic:' });
 
 const debug = getLogger().debugContext('newsub');
@@ -42,17 +44,26 @@ export default class USSDFlow {
     // get the session. if the session does not exist then process the first stage of rvd
     const subSession = await this.getSessionData(sessionid || msisdn);
     // application state
-    const state = { msisdn, imsi, cellid, sessionid, input };
+    const state = {
+      $core_From: msisdn,
+      $cell_id: cellid,
+      $session_id: sessionid,
+      $imsi: imsi,
+      $core_Body: input,
+    };
     const rvdController = new RVDController(subSession, state);
     const response = await rvdController.rvd(input);
-    // save session data
-    // console.log('====================================');
-    // console.log(response);
-    // console.log('====================================');
-    if (response.data) {
+
+    const Freeflow = response.next ? 'FC' : 'FB';
+
+    // check if storing session is needed
+    if (response.data && Freeflow === 'FC') {
       await this.saveSessionData(sessionid, msisdn, response.data);
     }
-    const Freeflow = response.next ? 'FC' : 'FB';
+    let reply = response.message;
+    if (!reply) {
+      reply = process.env.DefaultMsg;
+    }
     res.type('txt');
     res.set({
       Freeflow,
@@ -60,6 +71,6 @@ export default class USSDFlow {
       'Cache-Control': 'max-age=0',
       Pragma: 'no-cache',
     });
-    res.status(200).send(response.message);
+    res.status(200).send(reply);
   };
 }
