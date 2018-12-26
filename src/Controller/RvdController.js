@@ -1,3 +1,9 @@
+// import flatcache from 'flat-cache';
+import Redis from 'ioredis';
+import { promisify } from 'util';
+import fs from 'fs';
+import { join } from 'path';
+import { ActivatedProjects } from '../models'; // eslint-disable-line
 import rvdjson from '../../state/state.json';
 import { Kinds, ussdCollectGatherType } from './common';
 import ControlSteps from './ControlSteps';
@@ -6,8 +12,15 @@ import LogSteps from './LogStep';
 import UssdCollectSteps from './UssdCollectStep';
 import UssdSaySteps from './UssdSay';
 import { getLogger } from '../util';
+import config from '../config';
 
-const debug = getLogger().debugContext('rvd');
+// create a promise version of the fs readFile
+const freadAsync = promisify(fs.readFile);
+
+const { debug, printinfo, printerror } = getLogger().getContext('rvd');
+
+// const cache = flatcache.load('rvdCache');
+const cache = new Redis({ keyPrefix: 'paic:', ...config.redis });
 
 export default class RVDController {
   constructor(session = {}, state = {}) {
@@ -23,10 +36,55 @@ export default class RVDController {
     }
   }
 
+  readStates = async (shortcode) => {
+    let retvalue = null;
+    try {
+      const rvdjs = await cache.get(shortcode);
+      if (rvdjs) {
+        return JSON.parse(rvdjs);
+      }
+
+      // read from the databae all shortcode to be processed and cache them
+      const acPro = await ActivatedProjects.findAll();
+      if (acPro) {
+        acPro.forEach(async (item) => {
+          try {
+            const spath = join(
+              process.env.RESTCOMM_WORKSPACE_DIR,
+              item.sid,
+              'state',
+            );
+            const result = await freadAsync(spath, 'utf8');
+            await cache.set(item.shortcode, result);
+            if (item.shortcode === shortcode) {
+              retvalue = JSON.parse(result);
+            }
+          } catch (error) {
+            printerror('ERROR: %s', error.message);
+          }
+        });
+      }
+    } catch (error) {
+      printerror('ERROR: %s', error.message);
+    }
+    if (retvalue) {
+      return retvalue;
+    }
+    debug('................caching the shortcode to memory.................');
+    await cache.set(shortcode, JSON.stringify(rvdjson));
+    return rvdjson;
+  };
+
+  /**
+   *Process the RVD for USSD
+   * @param {String} moduleName the name of the module to load for the USSD flow
+   * @memberof RVDController
+   */
   rvdProcess = async (moduleName) => {
-    const { $core_From: msisdn, $cell_id: cellid } = this.data;
-    const allnodes = rvdjson.nodes.find((item) => item.name === moduleName);
-    debug(
+    const { $core_From: msisdn, $cell_id: cellid, $shortcode } = this.data;
+    const cRvd = await this.readStates($shortcode);
+    const allnodes = cRvd.nodes.find((item) => item.name === moduleName);
+    printinfo(
       `MODULE: ${moduleName}, NAME: ${
         allnodes ? allnodes.label : ''
       }, MSISDN=${msisdn}, cellid=${cellid}`,
@@ -47,6 +105,7 @@ export default class RVDController {
     // eslint-disable-next-line
     for (let i = 0; i < steps.length; i++) {
       const item = steps[i];
+      debug(`processing step: ${item.name || ''}, kind: ${item.kind}`);
       if (item.kind === Kinds.control) {
         // eslint-disable-next-line
         const retdata = await ctrlStep.process(item, this.data, this.temp);
@@ -87,7 +146,7 @@ export default class RVDController {
         retmsg.message = uMsg.message;
         retmsg.next = false;
       } else {
-        console.error(item); // eslint-disable-line
+        printinfo('INFO %o', item);
       }
     }
     if (continueTo) {
@@ -128,7 +187,9 @@ export default class RVDController {
         return this.rvdProcess(this.sessionInfo.moduleName);
       }
     }
-    const currentModule = rvdjson.header.startNodeName;
+    const defaultRVD = await this.readStates(this.data.$shortcode);
+
+    const currentModule = defaultRVD.header.startNodeName;
     return this.rvdProcess(currentModule);
   };
 }

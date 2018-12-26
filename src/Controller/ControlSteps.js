@@ -2,7 +2,7 @@ import { ConOperator, ConType, ReplaceVariables } from './common';
 
 import { getLogger, ensureArray } from '../util';
 
-const debug = getLogger().debugContext('ctrlStep');
+const { debug, printerror, printinfo } = getLogger().getContext('ctrlStep');
 
 export default class ControlSteps {
   process = async (step, appdata = {}, tempdata = {}) => {
@@ -25,7 +25,7 @@ export default class ControlSteps {
           op1 = parseFloat(first, 10);
           op2 = parseFloat(second, 10);
         }
-        debug(`operand1 = ${op1}, operand2 = ${op2}, type=${cod.operator}`);
+        debug(`isValid before expression evaluation = ${isValid}`);
         switch (cod.operator) {
           case ConOperator.eq:
             isValid = isValid && op1 === op2;
@@ -49,6 +49,11 @@ export default class ControlSteps {
             isValid = isValid && op1 === op2;
             break;
         }
+        printinfo(
+          `operand1 = ${op1}, operand2 = ${op2}, type=${
+            cod.operator
+          }, isValid=${isValid}`,
+        );
       });
     }
 
@@ -77,7 +82,7 @@ export default class ControlSteps {
               data[`$${act.capture.varName}`] = value[0]; // eslint-disable-line
             }
           } catch (error) {
-            console.error(error); // eslint-disable-line
+            printerror('ERROR: %s', error.message);
           }
         }
         // check if there is contineTo

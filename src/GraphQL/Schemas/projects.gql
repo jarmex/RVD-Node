@@ -1,0 +1,25 @@
+type Response {
+  result: Boolean
+  message: String
+}
+
+type Project {
+  sid: String!
+  dateCreated: DATE
+  dateUpdated: DATE
+  friendlyName: String
+  accountSid: String
+  shortcode: String
+}
+
+type Query {
+  getprojects: [Project]
+}
+
+type Mutation {
+  activateProject(sid: String!, shortcode: String!, friendlyName: String!) : Response
+  # delete a configuration from database
+  deleteProject(sid: String!): Response
+  # refresh a project
+  refreshProject(sid: String!, shortcode: String!) : Response
+}

@@ -3,7 +3,7 @@ import jsonpath from 'jsonpath';
 import { ReplaceVariables } from './common';
 import { getLogger } from '../util';
 
-const debug = getLogger().debugContext('extSrv');
+const { debug, printerror, printinfo } = getLogger().getContext('extSrv');
 
 export default class ExternalServiceSteps {
   process = async (step, appdata = {}, tempdata = {}) => {
@@ -33,8 +33,13 @@ export default class ExternalServiceSteps {
     const body = {};
     if (requestBody) {
       // console.log(step.requestBody);
-      const replacebody = ReplaceVariables(requestBody, data, temp);
-      Object.assign(body, JSON.parse(replacebody));
+      try {
+        const replacebody = ReplaceVariables(requestBody, data, temp);
+        Object.assign(body, JSON.parse(replacebody));
+      } catch (error) {
+        debug(requestBody);
+        printerror('ERROR: %s', error.message);
+      }
     }
 
     // if the url exist proceed
@@ -75,12 +80,11 @@ export default class ExternalServiceSteps {
                   querypath = querypath.substr(1);
                 }
                 let chm = jsonpath.query(axiosdata, querypath);
-                debug(querypath);
-                debug(chm);
+
                 if (Array.isArray(chm) && chm.length === 1) {
                   chm = chm[0]; // eslint-disable-line
                 }
-
+                printinfo(`${querypath} = ${chm}`);
                 if (ass.scope === 'module') {
                   temp[`$${ass.destVariable}`] = chm;
                 } else {
@@ -92,7 +96,7 @@ export default class ExternalServiceSteps {
         }
         // EXTRACT DATA HERE
       } catch (error) {
-        debug(error.message);
+        printerror('ERROR: %s', error.message);
       }
     }
     return {

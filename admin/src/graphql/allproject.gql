@@ -1,0 +1,11 @@
+query allprojects{
+  getprojects{
+    sid
+    accountSid
+    dateCreated
+    dateUpdated
+    shortcode
+    friendlyName
+    
+  }
+}

@@ -2,7 +2,7 @@ import { ReplaceVariables } from './common';
 
 import { getLogger } from '../util';
 
-const debug = getLogger().debugContext('logging');
+const { printinfo } = getLogger().getContext('logging');
 
 export default class LogSteps {
   process = async (step, appdata = {}, tempdata = {}) => {
@@ -10,7 +10,7 @@ export default class LogSteps {
 
     if (message) {
       const logmsg = ReplaceVariables(message, appdata, tempdata);
-      debug(logmsg);
+      printinfo(logmsg);
     }
   };
 }

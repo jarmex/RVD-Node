@@ -1,12 +1,13 @@
 import Redis from 'ioredis';
 import RVDController from './RvdController';
 import { getLogger } from '../util';
+import config from '../config';
 
 require('dotenv').config();
 
-const redis = new Redis({ keyPrefix: 'paic:' });
+const redis = new Redis({ keyPrefix: 'paic:', ...config.redis });
 
-const debug = getLogger().debugContext('newsub');
+const { debug, printinfo, printerror } = getLogger().getContext('flow');
 
 const SESSION_TIMEOUT = 40;
 
@@ -20,7 +21,7 @@ export default class USSDFlow {
         return JSON.parse(sessionsubdata);
       }
     } catch (error) {
-      debug('ERROR: %s', error.message);
+      printerror('ERROR: %s', error.message);
     }
     return null;
   };
@@ -33,14 +34,14 @@ export default class USSDFlow {
         JSON.stringify(data),
       );
     } catch (error) {
-      debug('ERROR: %s', error.message);
+      printerror('ERROR: %s', error.message);
     }
   };
 
   // all entry point for the application
   entryPoint = async (req, res) => {
     const { msisdn, imsi, cellid, sessionid, input } = req.query;
-    debug('REQ: %o', req.query);
+    printinfo('REQ: %o', req.query);
     // get the session. if the session does not exist then process the first stage of rvd
     const subSession = await this.getSessionData(sessionid || msisdn);
     // application state
@@ -51,6 +52,10 @@ export default class USSDFlow {
       $imsi: imsi,
       $core_Body: input,
     };
+    if (!subSession) {
+      // the first time request, the input is the same as the shortcode
+      state.$shortcode = input;
+    }
     const rvdController = new RVDController(subSession, state);
     const response = await rvdController.rvd(input);
 
@@ -62,6 +67,7 @@ export default class USSDFlow {
     }
     let reply = response.message;
     if (!reply) {
+      debug(`${msisdn}: No reply message found. Replying default message`);
       reply = process.env.DefaultMsg;
     }
     res.type('txt');
