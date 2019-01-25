@@ -108,7 +108,12 @@ export default class RVDController {
       debug(`processing step: ${item.name || ''}, kind: ${item.kind}`);
       if (item.kind === Kinds.control) {
         // eslint-disable-next-line
-        const retdata = await ctrlStep.process(item, this.data, this.temp);
+        const retdata = await ctrlStep.process(
+          item,
+          this.data,
+          this.temp,
+          moduleName,
+        );
 
         this.data = Object.assign(this.data, retdata.data);
         this.temp = Object.assign(this.temp, retdata.temp);
