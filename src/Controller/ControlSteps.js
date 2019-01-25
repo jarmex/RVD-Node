@@ -54,7 +54,7 @@ export default class ControlSteps {
             break;
         }
         debug(
-          `${cod.name}: ${op1} ${cod.operator} ${op2} = ${
+          `${cod.name}: ${op1} "${cod.operator}" ${op2} = ${
             conditionResults[name]
           }`,
         );
@@ -79,7 +79,7 @@ export default class ControlSteps {
         } else {
           const resultExist = conditionResults[nameOrcond];
           // check if result computed exist
-          if (resultExist) {
+          if (resultExist !== undefined) {
             if (prevAnd) {
               // the operand was AND
               isValid = isValid && conditionResults[nameOrcond];

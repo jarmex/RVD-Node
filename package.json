@@ -1,12 +1,12 @@
 {
-  "name": "RVDNode",
+  "name": "rvdnode",
   "version": "0.0.0",
   "private": true,
   "scripts": {
     "start": "DEBUG=ussd:* node ./dist/app.js",
     "dev": "DEBUG=ussd:* nodemon",
     "test": "mocha --require @babel/register",
-    "deploy": "./deploy.sh"
+    "deploy": "./compile && ./deploy.sh yarn"
   },
   "dependencies": {
     "apollo-server-express": "^2.3.1",
