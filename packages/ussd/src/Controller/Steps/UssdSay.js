@@ -1,4 +1,4 @@
-import { ReplaceVariables } from './common';
+import { ReplaceVariables } from '../Common';
 
 export default class UssdSaySteps {
   process = async (step, appdata = {}, tempdata = {}) => {

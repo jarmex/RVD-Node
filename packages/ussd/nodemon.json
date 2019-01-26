@@ -12,5 +12,8 @@
   "watch": [
     "src/"
   ],
-  "ext": "js json"
+  "ext": "js json",
+  "env": {
+    "DEBUG":"ussd:*" 
+  }
 }

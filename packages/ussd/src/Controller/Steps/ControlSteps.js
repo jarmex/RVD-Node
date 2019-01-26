@@ -1,6 +1,6 @@
-import { ConOperator, ConType, ReplaceVariables } from './common';
+import { ConOperator, ConType, ReplaceVariables } from '../Common';
 
-import { getLogger, ensureArray } from '../util';
+import { getLogger, ensureArray } from '../../util';
 
 const { debug, printerror } = getLogger().getContext('ctrlStep');
 

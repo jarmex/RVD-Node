@@ -5,12 +5,16 @@ import fs from 'fs';
 import { join } from 'path';
 import { ActivatedProjects } from '../models'; // eslint-disable-line
 import rvdjson from '../../state/state.json';
-import { Kinds, ussdCollectGatherType } from './common';
-import ControlSteps from './ControlSteps';
-import ExternalServiceSteps from './ExternalServiceStep';
-import LogSteps from './LogStep';
-import UssdCollectSteps from './UssdCollectStep';
-import UssdSaySteps from './UssdSay';
+import { Kinds, ussdCollectGatherType } from './Common/Constants';
+
+import {
+  UssdSaySteps,
+  UssdCollectSteps,
+  LogSteps,
+  ExternalServiceSteps,
+  ControlSteps,
+} from './Steps';
+
 import { getLogger } from '../util';
 import config from '../config';
 

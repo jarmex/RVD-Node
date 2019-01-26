@@ -4,7 +4,6 @@ import { createServer } from 'http';
 import createError from 'http-errors';
 import { join } from 'path';
 import Redis from 'ioredis';
-import { promisify } from 'util';
 import express, { json, urlencoded } from 'express';
 import morgan from 'morgan';
 import helmet from 'helmet';
@@ -86,8 +85,6 @@ app.set('port', port);
 
 // read the file. If the file does not exist exit the application
 const server = createServer(app);
-// async close
-const ServerCloseAysnc = promisify(server.close);
 
 // listen for errors
 server.on('error', (error) => {
@@ -132,8 +129,10 @@ process.on('SIGINT', async () => {
     debug('flushing redis database completed.');
     await redis.disconnect();
     debug('Disconnecting from redis database....');
-    await ServerCloseAysnc();
-    debug('server closed successfully');
+    server.close(() => {
+      debug('server closed successfully');
+    });
+    // debug('server closed successfully');
   } catch (error) {
     printerror('ERROR: %s', error.message);
     process.exit(1);

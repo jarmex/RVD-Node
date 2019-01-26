@@ -1,6 +1,6 @@
-import { ReplaceVariables } from './common';
+import { ReplaceVariables } from '../Common';
 
-import { getLogger } from '../util';
+import { getLogger } from '../../util';
 
 const { printinfo } = getLogger().getContext('logging');
 

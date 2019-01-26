@@ -1,6 +1,6 @@
 import debug from 'debug';
 
-class Logger {
+class LoggerClass {
   constructor(config) {
     this.config = Object.assign(
       {},
@@ -80,5 +80,6 @@ class Logger {
   }
 }
 
-export default () => new Logger();
-// module.exports.getLogger = () => new Logger();
+export default () => new LoggerClass();
+// eslint-disable-next-line
+export const Logger = (ch) => new LoggerClass().getContext(ch);

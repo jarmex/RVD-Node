@@ -1,7 +1,7 @@
 import axios from 'axios';
 import jsonpath from 'jsonpath';
-import { ReplaceVariables } from './common';
-import { getLogger } from '../util';
+import { ReplaceVariables } from '../Common';
+import { getLogger } from '../../util';
 
 const { debug, printerror, printinfo } = getLogger().getContext('extSrv');
 

@@ -1,5 +1,5 @@
-import { ensureArray } from '../util';
-import { ReplaceVariables } from './common';
+import { ensureArray } from '../../util';
+import { ReplaceVariables } from '../Common';
 
 export default class UssdCollectSteps {
   process = async (step, data = {}, temp = {}) => {
