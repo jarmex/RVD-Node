@@ -10,9 +10,10 @@
   ],
   "exec": "babel-node",
   "watch": [
-    "src/"
+    "src/",
+    "app.js"
   ],
-  "ext": "js json",
+  "ext": "js json gql",
   "env": {
     "DEBUG":"ussd:*" 
   }

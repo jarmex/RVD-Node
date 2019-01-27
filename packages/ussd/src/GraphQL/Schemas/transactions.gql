@@ -1,0 +1,26 @@
+type Transaction {
+  id: Int
+  msisdn:String
+  cellid: String
+  sessionid: String
+  imsi: String
+  shortcode: String
+  moduleName: String
+  moduleLabel: String
+  stepName: String
+  stepKind: String
+  flowend: Boolean
+  replyMessage: String
+  createdAt: DATE
+}
+
+type WeeklySummary {
+  Count: Int
+  DayName: String
+}
+
+type Query {
+  weeklysummary: [WeeklySummary]
+  transactions (msisdn: String!, feedcount: Int): [Transaction]
+  daystransaction: [Transaction]
+}

@@ -8,7 +8,7 @@ import express, { json, urlencoded } from 'express';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import { ApolloServer } from 'apollo-server-express';
-import { normalizePort, getLogger } from './src/util';
+import { normalizePort, getLogger, isAuthorized } from './src/util';
 import routings from './routes';
 import { typeDefs, resolvers } from './src/GraphQL';
 import models from './src/models';
@@ -41,15 +41,17 @@ routings(app);
 
 // handle the graphql
 const corOptions = {
-  origin: isDev ? 'http://localhost:8080' : true,
+  origin: isDev ? 'http://localhost:3000' : true,
   credentials: true,
 };
 
 const apolloServer = new ApolloServer({
   typeDefs,
   resolvers,
-  context: async () => ({
+  context: async ({ req, res }) => ({
     models,
+    auth: await isAuthorized(req.headers),
+    res,
   }),
   formatError: (error) => ({
     message: error.message,

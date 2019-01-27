@@ -1,0 +1,19 @@
+type RestCommAccount {
+  sid: String
+  dateCreated: DATE
+  dateUpdated: DATE
+  emailAddress: String
+  friendlyName: String
+  parentSid: String
+  token: String
+  status: String
+  type: String
+  role: String
+  organizationSid: String
+  uri: String
+}
+
+type Mutation {
+  # Login via RestComm
+  login (username: String!, password: String!): RestCommAccount
+}

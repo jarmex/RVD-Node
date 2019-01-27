@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { USSDFlowControl } from '../src/Controller';
+import { USSDFlowController } from '../src/Controller';
 
 const router = Router();
-const ussd = new USSDFlowControl();
+const ussd = new USSDFlowController();
 
 /* GET home page. */
 router

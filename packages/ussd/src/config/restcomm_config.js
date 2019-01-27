@@ -8,6 +8,9 @@ module.exports = {
     host: process.env.DB_HOST,
     dialect: 'mysql',
     operatorsAliases: false,
+    define: {
+      timestamps: false,
+    },
   },
   test: {
     username: 'root',
@@ -20,6 +23,9 @@ module.exports = {
       min: 20,
       max: 30,
     },
+    define: {
+      timestamps: false,
+    },
   },
   production: {
     username: process.env.DB_USER,
@@ -29,5 +35,8 @@ module.exports = {
     dialect: 'mysql',
     operatorsAliases: false,
     logging: false,
+    define: {
+      timestamps: false,
+    },
   },
 };

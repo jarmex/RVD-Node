@@ -1,4 +1,3 @@
-// import flatcache from 'flat-cache';
 import Redis from 'ioredis';
 import fs from 'fs';
 import { promisify } from 'util';
@@ -51,7 +50,14 @@ const getprojects = async () => {
   return null;
 };
 
-const activateProject = async (_, { sid, shortcode, friendlyName }) => {
+const activateProject = async (
+  _,
+  { sid, shortcode, friendlyName },
+  { auth },
+) => {
+  if (!auth) {
+    throw new ApolloError('Access denied');
+  }
   // steps
   /*
   1. check if the shortcode is already in use
@@ -90,8 +96,11 @@ const activateProject = async (_, { sid, shortcode, friendlyName }) => {
     };
   } catch (error) {
     printerror('ERROR: %s', error.message);
+    return {
+      result: false,
+      message: error.message,
+    };
   }
-  return null;
 };
 
 const deleteProject = async (_, { sid }) => {

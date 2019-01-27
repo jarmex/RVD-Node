@@ -1,1 +1,1 @@
-export { default as USSDFlowControl } from './USSDFlow';
+export { default as USSDFlowController } from './USSDFlowController';
