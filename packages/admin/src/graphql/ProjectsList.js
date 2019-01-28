@@ -29,3 +29,12 @@ export const ActivateShortCodeGQL = gql`
     }
   }
 `;
+
+export const RefreshProjectGQL = gql`
+  mutation refreshProject($sid: String!, $shortcode: String!) {
+    refreshProject(sid: $sid, shortcode: $shortcode) {
+      result
+      message
+    }
+  }
+`;

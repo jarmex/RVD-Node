@@ -142,8 +142,16 @@ const refreshProject = async (_, { sid, shortcode }) => {
     debug(`Reloading file of size: ${stat.size}`);
     const filecontent = await fsreadAsync(spath, 'utf8');
     cache.set(shortcode, filecontent);
+    return {
+      result: true,
+      message: `Refresh for ${sid} was completed successfully`,
+    };
   } catch (error) {
     printerror('ERROR: %s', error.message);
+    return {
+      result: false,
+      message: 'Refresh failed',
+    };
   }
 };
 

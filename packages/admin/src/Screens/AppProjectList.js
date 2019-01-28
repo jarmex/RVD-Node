@@ -1,7 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Query } from 'react-apollo';
-import { QueryProjectListGQL } from '../graphql/ProjectsList';
+import { Query, Mutation } from 'react-apollo';
+import {
+  QueryProjectListGQL,
+  RefreshProjectGQL,
+} from '../graphql/ProjectsList';
 import { withStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -16,6 +19,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import IconButton from '@material-ui/core/IconButton';
+import RefreshIcon from '@material-ui/icons/Refresh';
 import EditProject from './EditProject';
 import { UserConsumer } from '../routes/LoginContext';
 
@@ -49,6 +53,26 @@ class AppProjectList extends React.Component {
   };
   formatDate = (date) => dayjs(date).fromNow();
 
+  handleRefresh = async (e, data, refreshProject) => {
+    e.preventDefault();
+    const { sid, shortcode } = data;
+    if (!shortcode) {
+      alert('Cannot refresh. Try again');
+      return;
+    }
+    try {
+      const { data } = await refreshProject({
+        variables: {
+          sid,
+          shortcode,
+        },
+      });
+      const { message } = data.refreshProject;
+      alert(message);
+    } catch (error) {
+      alert('ERROR!!' + error.message);
+    }
+  };
   render() {
     const { classes } = this.props;
     return (
@@ -64,65 +88,80 @@ class AppProjectList extends React.Component {
           return (
             <UserConsumer>
               {({ login }) => (
-                <Paper className={classes.root}>
-                  <Table className={classes.table}>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Application Id</TableCell>
-                        <TableCell>Name</TableCell>
-                        <TableCell>Short Code</TableCell>
-                        <TableCell align="right">Date Created</TableCell>
-                        <TableCell align="right">Date Updated</TableCell>
-                        <TableCell align="right" />
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {getprojects.map((n) => (
-                        <TableRow key={n.sid}>
-                          <TableCell component="th" scope="row">
-                            {n.sid}
-                          </TableCell>
-                          <TableCell>{n.friendlyName}</TableCell>
-                          <TableCell>{n.shortcode}</TableCell>
-                          <TableCell align="right">
-                            {this.formatDate(n.dateCreated)}
-                          </TableCell>
-                          <TableCell align="right">
-                            {this.formatDate(n.dateUpdated)}
-                          </TableCell>
-                          <TableCell align="right">
-                            {login ? (
-                              <IconButton
-                                className={classes.button}
-                                aria-label="Delete"
-                                onClick={(e) => {
-                                  this.setState({ selectedProject: n });
-                                  this.handleClickOpen();
-                                }}
-                              >
-                                <CreateIcon />
-                              </IconButton>
-                            ) : null}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                  <Dialog
-                    disableBackdropClick
-                    disableEscapeKeyDown
-                    open={this.state.open}
-                    onClose={this.handleClose}
-                    aria-labelledby="form-dialog-title"
-                  >
-                    <DialogContent>
-                      <EditProject
-                        project={this.state.selectedProject}
+                <Mutation mutation={RefreshProjectGQL}>
+                  {(refreshProject) => (
+                    <Paper className={classes.root}>
+                      <Table className={classes.table}>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Application Id</TableCell>
+                            <TableCell>Name</TableCell>
+                            <TableCell>Short Code</TableCell>
+                            <TableCell align="right">Date Created</TableCell>
+                            <TableCell align="right">Date Updated</TableCell>
+                            <TableCell align="right" />
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {getprojects.map((n) => (
+                            <TableRow key={n.sid}>
+                              <TableCell component="th" scope="row">
+                                {n.sid}
+                              </TableCell>
+                              <TableCell>{n.friendlyName}</TableCell>
+                              <TableCell>{n.shortcode}</TableCell>
+                              <TableCell align="right">
+                                {this.formatDate(n.dateCreated)}
+                              </TableCell>
+                              <TableCell align="right">
+                                {this.formatDate(n.dateUpdated)}
+                              </TableCell>
+                              <TableCell align="right">
+                                <div>
+                                  <IconButton
+                                    className={classes.button}
+                                    aria-label="Delete"
+                                    onClick={(e) =>
+                                      this.handleRefresh(e, n, refreshProject)
+                                    }
+                                  >
+                                    <RefreshIcon />
+                                  </IconButton>
+                                  {login ? (
+                                    <IconButton
+                                      className={classes.button}
+                                      aria-label="Delete"
+                                      onClick={(e) => {
+                                        this.setState({ selectedProject: n });
+                                        this.handleClickOpen();
+                                      }}
+                                    >
+                                      <CreateIcon />
+                                    </IconButton>
+                                  ) : null}
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                      <Dialog
+                        disableBackdropClick
+                        disableEscapeKeyDown
+                        open={this.state.open}
                         onClose={this.handleClose}
-                      />
-                    </DialogContent>
-                  </Dialog>
-                </Paper>
+                        aria-labelledby="form-dialog-title"
+                      >
+                        <DialogContent>
+                          <EditProject
+                            project={this.state.selectedProject}
+                            onClose={this.handleClose}
+                          />
+                        </DialogContent>
+                      </Dialog>
+                    </Paper>
+                  )}
+                </Mutation>
               )}
             </UserConsumer>
           );

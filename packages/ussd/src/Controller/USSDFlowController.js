@@ -149,6 +149,10 @@ export default class USSDFlowController {
       await this.saveTransaction(response, reply);
     } else if (isSaveTransEnabled === 'UPDATE') {
       await this.saveTransaction(response, reply, true);
+    } else if (isSaveTransEnabled === 'STARTEND') {
+      if (!subSession || Freeflow === 'FB') {
+        await this.saveTransaction(response, reply);
+      }
     }
     // else NONE.
 
