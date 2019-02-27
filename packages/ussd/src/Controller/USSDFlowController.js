@@ -123,6 +123,7 @@ export default class USSDFlowController {
       $session_id: sessionid,
       $imsi: imsi,
       $core_Body: input,
+      $cellid: cellid,
     };
     if (!subSession) {
       // the first time request, the input is the same as the shortcode
