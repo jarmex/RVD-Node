@@ -48,3 +48,47 @@ export const QueryDayTransGQL = gql`
     }
   }
 `;
+
+export const QueryHitzByDayGQL = gql`
+  query queryHitzByDay($flowend: Boolean, $startDate: DATE, $endDate: DATE) {
+    queryHitzByDay(
+      flowend: $flowend
+      startDate: $startDate
+      endDate: $endDate
+    ) {
+      count
+      Date
+      moduleName
+      moduleLabel
+    }
+  }
+`;
+
+export const QueryMSISDNCountGQL = gql`
+  query queryMsisdnCount($startDate: DATE, $endDate: DATE) {
+    queryMsisdnCount(startDate: $startDate, endDate: $endDate) {
+      msisdn
+      count
+      Date
+    }
+  }
+`;
+
+export const QueryTop100TransGQL = gql`
+  query {
+    toptrans {
+      id
+      msisdn
+      cellid
+      shortcode
+      sessionid
+      moduleName
+      moduleLabel
+      stepName
+      stepKind
+      flowend
+      replyMessage
+      createdAt
+    }
+  }
+`;

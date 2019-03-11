@@ -15,9 +15,13 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ExitToApp from '@material-ui/icons/ExitToApp';
 import SideBar from './SideBar';
-
+import RVDDesigner from './RVD Designer/index';
 import Dashboard from './Dashboard';
-import MSISDNResport from './Reports/ByMSISDN/TransByMSISDN';
+import MSISDNReport from './Reports/ByMSISDN/TransByMSISDN';
+import ReportPage from './Reports/ReportPage';
+import { ApplicationProjects } from './Projects';
+import ShowGLReport from './Reports/GlobalCount/ShowGLReport';
+import LatestTransaction from './Reports/SubAudit/LastestTrans';
 
 const drawerWidth = 240;
 
@@ -180,11 +184,17 @@ class AppContainer extends React.Component {
           <Divider />
           <SideBar onNavigate={this.onNavigate} />
         </Drawer>
+        {/* // TODO add the other reports */}
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
           <Switch>
             <Route path="/data" component={Dashboard} />
-            <Route path="/msisdn" component={MSISDNResport} />
+            <Route path="/msisdn" component={MSISDNReport} />
+            <Route path="/applications" component={ApplicationProjects} />
+            <Route path="/report" component={ReportPage} />
+            <Route path="/rvddesigner" component={RVDDesigner} />
+            <Route path="/glreport" component={ShowGLReport} />
+            <Route path="/audreport" component={LatestTransaction} />
             <Route path="/" component={Dashboard} />
           </Switch>
         </main>

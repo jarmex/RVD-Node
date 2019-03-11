@@ -19,8 +19,28 @@ type WeeklySummary {
   DayName: String
 }
 
+type ModuleHit {
+  count: Int
+  moduleLabel: String
+  moduleName: String
+  Date: String
+}
+
+type MsisdnCount {
+  msisdn: String
+  count: Int
+  Date: String
+}
+
+
+
 type Query {
   weeklysummary: [WeeklySummary]
   transactions (msisdn: String!, feedcount: Int): [Transaction]
   daystransaction: [Transaction]
+  queryModuleHitz(flowend: Boolean, startDate: DATE, endDate: DATE): [ModuleHit]
+  queryHitzByDay(flowend: Boolean, startDate: DATE, endDate: DATE) : [ModuleHit]
+  queryMsisdnCount(startDate: DATE, endDate: DATE): [MsisdnCount]
+  querytransByday(startDate: DATE, endDate: DATE): [MsisdnCount]
+  toptrans: [Transaction]
 }
