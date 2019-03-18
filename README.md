@@ -1,4 +1,4 @@
-# comviva_restcomm
+# Comviva RestComm USSD Integration
 The application integrate with a Comviva USSD via HTTP(S). All the design of the USSD Menu is done via the RestComm RVD interface.
 Read more about RestComm RVD from this link [Restcomm Visual Designer](https://www.restcomm.com/docs/connect/rvd/Quick%20Start%20Guide.html).
 
