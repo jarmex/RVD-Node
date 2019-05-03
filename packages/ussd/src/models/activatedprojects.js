@@ -18,6 +18,10 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         unique: true,
       },
+      NodeId: {
+        type: DataTypes.INTEGER,
+        unique: true,
+      },
     },
     {},
   );

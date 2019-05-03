@@ -94,7 +94,7 @@ class AppProjectList extends React.Component {
                       <Table className={classes.table}>
                         <TableHead>
                           <TableRow>
-                            <TableCell>Application Id</TableCell>
+                            <TableCell>#</TableCell>
                             <TableCell>Name</TableCell>
                             <TableCell>Short Code</TableCell>
                             <TableCell align="right">Date Created</TableCell>
@@ -106,7 +106,7 @@ class AppProjectList extends React.Component {
                           {getprojects.map((n) => (
                             <TableRow key={n.sid}>
                               <TableCell component="th" scope="row">
-                                {n.sid}
+                                {n.NodeId}
                               </TableCell>
                               <TableCell>{n.friendlyName}</TableCell>
                               <TableCell>{n.shortcode}</TableCell>

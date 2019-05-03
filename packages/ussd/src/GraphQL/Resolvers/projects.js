@@ -84,10 +84,14 @@ const activateProject = async (
       sidExist.shortcode = shortcode;
       await sidExist.save();
     } else {
+      // generate the NodeId for the project
+      const maxNumber = (await ActivatedProjects.max('NodeId')) || 0;
+
       await ActivatedProjects.create({
         sid,
         shortcode,
         friendlyName,
+        NodeId: maxNumber + 1,
       });
     }
     return {

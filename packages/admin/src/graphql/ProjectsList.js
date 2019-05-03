@@ -9,6 +9,7 @@ export const QueryProjectListGQL = gql`
       dateUpdated
       shortcode
       friendlyName
+      NodeId
     }
   }
 `;

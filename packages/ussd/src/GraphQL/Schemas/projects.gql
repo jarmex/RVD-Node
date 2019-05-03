@@ -10,6 +10,7 @@ type Project {
   friendlyName: String
   accountSid: String
   shortcode: String
+  NodeId: Int
 }
 
 type Query {
