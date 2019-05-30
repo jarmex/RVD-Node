@@ -1,0 +1,70 @@
+{
+  "name": "smpp",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "DEBUG=smpp:* babel-node src/app.js"
+  },
+  "dependencies": {
+    "@rvd/common": "0.1.3",
+    "debug": "^4.1.1",
+    "dotenv": "^8.0.0",
+    "ioredis": "^4.9.5",
+    "mysql2": "^1.6.5",
+    "sequelize": "^5.8.7",
+    "sequelize-cli": "^5.4.0",
+    "smpp": "https://github.com/farhadi/node-smpp.git"
+  },
+  "babel": {
+    "presets": [
+      [
+        "@babel/preset-env",
+        {
+          "targets": {
+            "node": "12.1"
+          },
+          "loose": true
+        }
+      ]
+    ],
+    "plugins": [
+      [
+        "@babel/proposal-object-rest-spread",
+        {
+          "useBuiltIns": true
+        }
+      ],
+      [
+        "@babel/plugin-proposal-class-properties"
+      ],
+      [
+        "@babel/plugin-transform-classes",
+        {
+          "loose": true
+        }
+      ]
+    ],
+    "ignore": [
+      "./node_modules"
+    ]
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.4",
+    "@babel/node": "^7.2.2",
+    "@babel/plugin-proposal-class-properties": "^7.4.4",
+    "@babel/plugin-proposal-object-rest-spread": "^7.4.4",
+    "@babel/plugin-transform-classes": "^7.4.4",
+    "@babel/preset-env": "^7.4.4",
+    "babel-eslint": "^10.0.1",
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "eslint": "5.16.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-plugin-import": "^2.17.2",
+    "eslint-plugin-jsx-a11y": "^6.2.1",
+    "eslint-plugin-react": "^7.12.4",
+    "mocha": "^6.1.4"
+  }
+}
