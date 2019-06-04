@@ -1,10 +1,15 @@
 import { RVDController } from '@rvd/common';
-import { logger } from '../utils';
+import { logger, getUSSDServiceOp } from '../utils';
 import redisconfig from './redisconfig';
+import defaultrvd from '../state/state.json';
+// eslint-disable-next-line
+import { Transactions } from '../models';
+import { decodeSMPPMessage } from './comviva';
 
 const { printerror, debug } = logger().getContext('deliversm');
 
 const getSessionInfo = (itsInfo) => {
+  debug(itsInfo);
   if (itsInfo) {
     return Buffer.from(itsInfo).toString('hex');
   }
@@ -25,36 +30,65 @@ const rvdparam = {
   USSD_SAVE_TRANSACTION,
   defaultWorkSpace: RESTCOMM_WORKSPACE_DIR,
   defaultErrorMsg: DefaultMsg,
+  defaultRVDJson: defaultrvd,
 };
 // create an instance of the RVDController
 const rvdprocess = new RVDController(rvdparam);
 
-rvdprocess.on('updatetrans', (data) => {
+// update database for continuing transaction
+rvdprocess.on('updatetrans', async ({ dbobject }) => {
   // update transaction in the database
   debug('Update Transaction');
-  debug('%o', data);
+  debug('%o', dbobject);
+  try {
+    if (dbobject.sessionid) {
+      const toUpdatedb = await Transactions.findOne({
+        where: {
+          sessionid: dbobject.sessionid,
+        },
+      });
+      if (toUpdatedb) {
+        Object.keys(dbobject).forEach((item) => {
+          toUpdatedb[item] = dbobject[item];
+        });
+        await toUpdatedb.save();
+      } else {
+        // create a new record for this
+        await Transactions.create(dbobject);
+      }
+    } else {
+      // no sessionid. insert the object to database anytime
+      await Transactions.create(dbobject);
+    }
+  } catch (error) {
+    printerror(error.message);
+  }
 });
 
-rvdprocess.on('savetrans', (data) => {
+rvdprocess.on('savetrans', async ({ dbobject }) => {
   // save transaction to database
   debug('Save Transaction');
-  debug('%o', data);
+  debug('%o', dbobject);
+  try {
+    await Transactions.create(dbobject);
+  } catch (error) {
+    printerror(error.message);
+  }
 });
 
-const extractdata = (msisdn, message, pdu) => {
-  const { imsi, cellid, sessionid, input, shortcode, sid } = pdu;
-  debug(`ussd_service_op = ${pdu.ussd_service_op}`);
+// extract the information from the PDU
+const extractdata = (msisdn, destination, message, pdu) => {
+  const { cellid, ...decodemsg } = decodeSMPPMessage(message);
+  // get the shortcode and the sid for the shortcode
+  decodemsg.cellid = cellid || decodemsg.subscriberlocation || '';
+  decodemsg.shortcode = destination;
+  decodemsg.msisdn = decodemsg.msisdn || msisdn;
   const itssessionInfo = getSessionInfo(pdu.its_session_info);
-  debug(itssessionInfo);
-  return {
-    msisdn,
-    imsi,
-    cellid,
-    sessionid,
-    input,
-    sid,
-    shortcode,
-  };
+  decodemsg.itssessionInfo = itssessionInfo;
+  debug(`its_session_info: ${itssessionInfo}`);
+  decodemsg.serviceop = pdu.ussd_service_op;
+  debug(`ussd_service_op = ${pdu.ussd_service_op}`);
+  return decodemsg;
 };
 
 /**
@@ -64,7 +98,7 @@ const extractdata = (msisdn, message, pdu) => {
 export default async (pdu) => {
   const { source_addr: source, destination_addr: destination, short_message: shortMessage } = pdu;
   const { message } = shortMessage;
-  debug(`MSISDN=${source}, DESTINATION=${destination}, MSG=${shortMessage}`);
+  debug(`MSISDN=${source}, DESTINATION=${destination}, MSG=${message}`);
   // process the message and result
   try {
     // Extract the following from the pdu + message
@@ -75,10 +109,20 @@ export default async (pdu) => {
     // input,
     // sid,
     // shortcode,
-    const request = extractdata(source, message, pdu);
+    const request = extractdata(source, destination, message, pdu);
     const response = await rvdprocess.entryPoint(request);
-    // format the response message for SMS
-    return response;
+    debug('%o', response);
+    const serviceOp = getUSSDServiceOp(request.serviceop, response.header.Freeflow === 'FB');
+    // its_session_info: Buffer.from(`${sendparam.its_session_info || 0}`, 'hex'),
+    const retvalue = {
+      source_addr: destination,
+      destination_addr: source,
+      short_message: response.message,
+      ussd_service_op: serviceOp,
+      its_session_info: request.itssessionInfo,
+    };
+    debug('%o', retvalue);
+    return retvalue;
   } catch (error) {
     printerror(`${source}: ERROR: ${error.message}`);
     return null;

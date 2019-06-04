@@ -4,10 +4,10 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "DEBUG=smpp:* babel-node src/app.js"
+    "dev": "DEBUG=ussd:*,ioredis:*,smpp:* babel-node src/app.js"
   },
   "dependencies": {
-    "@rvd/common": "0.1.3",
+    "@rvd/common": "0.1.5",
     "debug": "^4.1.1",
     "dotenv": "^8.0.0",
     "ioredis": "^4.9.5",

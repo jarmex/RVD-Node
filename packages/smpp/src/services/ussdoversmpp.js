@@ -2,7 +2,7 @@
 import smpp from 'smpp';
 import procDeliverSm from './deliversm';
 
-import { logger, UssdServiceOp } from '../utils';
+import { logger } from '../utils';
 
 const { printerror, debug } = logger().getContext('ussd');
 
@@ -145,28 +145,13 @@ class UssdOverSmpp {
       return;
     }
     // if there is not message to be sent exit.
-    if (!sendparam.message) {
+    if (!sendparam.short_message) {
       printerror('failed to send the message. Message undefined or null');
       printerror('%o', sendparam);
       return;
     }
 
-    const msg = {
-      short_message: sendparam.message,
-      source_addr: sendparam.from,
-      destination_addr: sendparam.msisdn,
-      data_coding: 0x0f,
-      its_session_info: Buffer.from(`${sendparam.its_session_info || 0}`, 'hex'),
-      ...this.options.submitSm,
-    };
-
-    // check the ussd_service_op type
-    if (sendparam.ussdserviceop) {
-      msg.ussd_service_op = sendparam.ussdserviceop; // USSN Request
-    } else {
-      const serviceOp = UssdServiceOp(sendparam.pushtype);
-      msg.ussd_service_op = serviceOp;
-    }
+    const msg = Object.assign({}, { ...this.options.submitSm }, { ...sendparam });
 
     debug('sending message to the SMSC');
 
@@ -227,12 +212,12 @@ class UssdOverSmpp {
       if (this.reconnectCounter < this.maxEnquireLink) {
         this.reconnectCounter = this.reconnectCounter + 1;
         debug(`Failed to connect to SMPP server. Message: ${pdu.message}`);
-        // TODO: try to re-establish connect to the SMSC
+        // try to re-establish connect to the SMSC
         if (!this.session) {
           // trying to re-establish connection again
           debug('re-establishing network connection');
           this.session.connect();
-          // TODO: unlink any events here
+          this.session.resume();
         }
       } else {
         printerror('Failed to connect. Existing application');
@@ -241,7 +226,6 @@ class UssdOverSmpp {
     } else {
       debug(`Error Code: ${pdu.code}, Message: ${pdu.message}`); // e.g. ECONNREFUSED
     }
-    // this.session.close();
   };
 }
 

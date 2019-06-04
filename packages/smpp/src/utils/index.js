@@ -14,32 +14,47 @@ export const decodeFromBase64 = (param) => {
   return '';
 };
 
-export const UssdServiceOp = (text) => {
-  // eslint-disable-next-line
-  const smpp_service_op = {
-    pssdindication: 0, // PSSD Indication
-    pssrIndication: 1, // PSSR Indication
-    ussrrequest: 2, // USSR Request
-    ussnrequest: 3, // USSN Request
-    pssdresponse: 16, // 16 = PSSD Response
-    pssrresponse: 17, // 17 = PSSR Response
-    ussrconfirm: 18, // 18 = USSR Confirm
-    ussnconfirm: 19, // 19 = USSN Confirm
-  };
-  const result = smpp_service_op[text];
-  if (result) {
-    return parseInt(result, 10);
+export const USSDSERVICEOP = {
+  PSSD_Indication: 0,
+  PSSR_Indication: 1,
+  USSR_Request: 2,
+  USSN_Request: 3,
+  PSSD_Response: 16,
+  PSSR_Response: 17,
+  USSR_Confirm: 18,
+  USSN_Confirm: 19,
+};
+
+export const getUSSDServiceOp = (serviceop, fb) => {
+  if (fb) {
+    return USSDSERVICEOP.PSSR_Response;
   }
-  // other
-  switch (text) {
-    case 'requesttext':
-    case 'ussdpush':
-      return 3;
-    case 'menu':
-      return 2;
-    case 'text':
-      return 19;
+  switch (serviceop) {
+    case 0:
+      return USSDSERVICEOP.USSR_Request;
+    case 2:
+      return USSDSERVICEOP.USSR_Request;
+    case 3:
+      return USSDSERVICEOP.PSSR_Response;
+
     default:
-      return 19;
+      return USSDSERVICEOP.PSSR_Response;
   }
+  // check if the sericeop number is in the list
+  // const result = USSDSERVICEOP[text];
+  // if (result) {
+  //   return parseInt(result, 10);
+  // }
+  // other
+  // switch (text) {
+  //   case 'requesttext':
+  //   case 'ussdpush':
+  //     return 3;
+  //   case 'menu':
+  //     return 2;
+  //   case 'text':
+  //     return 19;
+  //   default:
+  //     return 19;
+  // }
 };
