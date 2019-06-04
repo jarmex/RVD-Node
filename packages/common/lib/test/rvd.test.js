@@ -1,6 +1,6 @@
 "use strict";
 
-var _chai = _interopRequireDefault(require("chai"));
+var _should = _interopRequireDefault(require("should"));
 
 var _src = require("../src");
 
@@ -8,16 +8,16 @@ var _state = _interopRequireDefault(require("../../smpp/src/state/state.json"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const should = _chai.default.should();
-
-describe('RVD testing http functionality', () => {
+describe.skip('RVD testing http functionality', () => {
   describe('testing http functionality with REDIS', () => {
     it('should throw an error without Redis parameters', done => {
       try {
         const rvd = new _src.RVDController({});
-        done(rvd.SESSION_TIMEOUT);
+
+        _should.default.not.exist(rvd);
       } catch (error) {
-        should.exist(error);
+        _should.default.exist(error);
+
         'Redis parameters are required'.should.equal(error.message);
       }
 
@@ -28,10 +28,12 @@ describe('RVD testing http functionality', () => {
         const rvd = new _src.RVDController({
           redisparam: 'test'
         });
-        should.not.exist(rvd);
+
+        _should.default.not.exist(rvd);
       } catch (error) {
-        should.exist(error);
-        'Invalid Redis parameters'.should.equal(error.message);
+        _should.default.exist(error);
+
+        'Invalid Redis parameters'.should.be.equal(error.message);
       }
 
       done();
@@ -45,14 +47,15 @@ describe('RVD testing http functionality', () => {
             family: 4
           }
         });
-        should.exist(rvd);
+
+        _should.default.exist(rvd);
       } catch (error) {
-        should.not.exist(error);
+        _should.default.not.exist(error);
       }
 
       done();
     });
-    it('should create a session in the redis database', async done => {
+    it('should create a session in the redis database', done => {
       try {
         const rvd = new _src.RVDController({
           redisparam: {
@@ -63,18 +66,29 @@ describe('RVD testing http functionality', () => {
           defaultWorkSpace: '/Users/jamo/Documents/Projects/Node/PAiC/RVDNode/packages/ussd/state',
           defaultRVDJson: _state.default
         });
-        should.exist(rvd);
-        rvd.SESSION_TIMEOUT.should.equal(40);
-        rvd.defaultErrorMsg.should.eqal('Error processing request');
-        const result = await rvd.entryPoint({
+
+        _should.default.exist(rvd);
+
+        rvd.SESSION_TIMEOUT.should.be.equal(40);
+        rvd.defaultErrorMsg.should.be.equal('Error processing request');
+        rvd.entryPoint({
           msisdn: '123456',
           cellid: '',
           shortcode: '530',
           sessionid: '23412341234123423'
+        }).then(result => {
+          _should.default.exist(result);
+
+          result.status.should.equal(200);
+          result.should.have.property('message').be.ok();
+          done();
+        }).catch(err => {
+          _should.default.not.exist(err);
+
+          done();
         });
-        should.exist(result);
       } catch (error) {
-        should.not.exist(error);
+        _should.default.not.exist(error);
       }
 
       done();
