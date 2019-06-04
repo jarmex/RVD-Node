@@ -1,7 +1,6 @@
-
 {
   "name": "@rvd/common",
-  "version": "0.1.3",
+  "version": "0.1.5",
   "main": "./lib/index.js",
   "license": "MIT",
   "author": "James Amo <jarmex@gmail.com>",
@@ -14,8 +13,7 @@
     "axios": "^0.18.0",
     "debug": "^4.1.1",
     "ioredis": "^4.9.0",
-    "jsonpath": "^1.0.1",
-    "sqlite3": "^4.0.6"
+    "jsonpath": "^1.0.1"
   },
   "babel": {
     "presets": [
@@ -66,6 +64,7 @@
     "eslint-plugin-import": "^2.17.2",
     "eslint-plugin-jsx-a11y": "^6.2.1",
     "eslint-plugin-react": "^7.12.4",
-    "mocha": "^6.1.4"
+    "mocha": "^6.1.4",
+    "should": "^13.2.3"
   }
 }

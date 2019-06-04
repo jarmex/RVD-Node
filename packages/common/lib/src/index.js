@@ -1,7 +1,7 @@
 "use strict";
 
 exports.__esModule = true;
-exports.RVDController = void 0;
+exports.ensureArray = exports.RVDController = void 0;
 
 var _ioredis = _interopRequireDefault(require("ioredis"));
 
@@ -12,6 +12,10 @@ var _RVDNode = _interopRequireDefault(require("./RVDNode"));
 var _logger = _interopRequireWildcard(require("./logger"));
 
 exports.LoggerClass = _logger.LoggerClass;
+
+var _ensureArray = _interopRequireDefault(require("./ensureArray"));
+
+exports.ensureArray = _ensureArray.default;
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
@@ -197,6 +201,10 @@ function (_EventEmitter) {
 
     if (!redisparam) {
       throw new Error('Redis parameters are required');
+    }
+
+    if (typeof redisparam !== 'object') {
+      throw new Error('Invalid Redis parameters');
     }
 
     _this.redis = new _ioredis.default(_objectSpread({

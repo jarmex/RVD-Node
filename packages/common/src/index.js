@@ -19,6 +19,9 @@ export class RVDController extends EventEmitter {
     if (!redisparam) {
       throw new Error('Redis parameters are required');
     }
+    if (typeof redisparam !== 'object') {
+      throw new Error('Invalid Redis parameters');
+    }
     this.redis = new Redis({ keyPrefix: 'paic:', ...redisparam });
     // is save transaction enabled. possible values ALL, END, or default NONE
     this.isSaveTransEnabled = USSD_SAVE_TRANSACTION;
@@ -180,3 +183,5 @@ export class RVDController extends EventEmitter {
 }
 
 export { LoggerClass };
+
+export { default as ensureArray } from './ensureArray';
