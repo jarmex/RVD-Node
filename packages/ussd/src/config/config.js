@@ -7,7 +7,7 @@ module.exports = {
     database: process.env.DB_TRANSACTION_NAME,
     host: process.env.DB_HOST,
     dialect: 'mysql',
-    operatorsAliases: false,
+    // operatorsAliases: false,
     sync: { force: false },
   },
   test: {
@@ -28,7 +28,7 @@ module.exports = {
     database: process.env.DB_TRANSACTION_NAME,
     host: process.env.DB_HOST,
     dialect: 'mysql',
-    operatorsAliases: false,
+    // operatorsAliases: false,
     logging: false,
     sync: { force: false },
   },
