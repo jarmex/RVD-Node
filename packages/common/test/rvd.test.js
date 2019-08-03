@@ -2,7 +2,7 @@ import should from 'should';
 import { RVDController } from '../src';
 import rvdjson from '../../smpp/src/state/state.json';
 
-describe.skip('RVD testing http functionality', () => {
+describe('RVD testing http functionality', () => {
   describe('testing http functionality with REDIS', () => {
     it('should throw an error without Redis parameters', (done) => {
       try {
@@ -41,7 +41,7 @@ describe.skip('RVD testing http functionality', () => {
       }
       done();
     });
-    it('should create a session in the redis database', (done) => {
+    it.skip('should create a session in the redis database', (done) => {
       try {
         const rvd = new RVDController({
           redisparam: {
