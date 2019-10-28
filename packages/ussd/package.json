@@ -25,7 +25,7 @@
     "merge-graphql-schemas": "1.7.0",
     "morgan": "1.9.1",
     "mysql2": "1.6.5",
-    "sequelize": "5.12.2",
+    "sequelize": "5.15.1",
     "sequelize-cli": "5.5.0",
     "sqlite3": "4.0.9"
   },
